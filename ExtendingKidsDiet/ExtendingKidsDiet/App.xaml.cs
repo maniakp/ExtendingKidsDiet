@@ -5,19 +5,36 @@ using Microsoft.AppCenter.Crashes;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using ExtendingKidsDiet.Const;
-
+using ExtendingKidsDiet.ViewModels;
+using ExtendingKidsDiet.Views;
+using Prism.Ioc;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 
 namespace ExtendingKidsDiet
 {
-    public partial class App : Application
+    public partial class App 
     {
         public App()
         {
+        }
+
+        protected override async void OnInitialized()
+        {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            var result = await NavigationService.NavigateAsync("MainPage");
+
+            if(!result.Success)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+        }
+
+        protected override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            containerRegistry.RegisterForNavigation<NavigationPage>();
+            containerRegistry.RegisterForNavigation<MainPage, MainPageViewModel>();
         }
 
         protected override void OnStart()
@@ -27,15 +44,10 @@ namespace ExtendingKidsDiet
                             $"ios={AppSecrets.AppCenterIosSecret}",
                 typeof(Analytics), typeof(Crashes));
         }
+        
+        
 
-        protected override void OnSleep()
-        {
-            // Handle when your app sleeps
-        }
 
-        protected override void OnResume()
-        {
-            // Handle when your app resumes
-        }
+        
     }
 }
